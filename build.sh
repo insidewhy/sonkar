@@ -24,8 +24,10 @@ acbuild dependency add quay.io/coreos/alpine-sh
 # acbuild dependency add quay.io/aptible/busybox
 acbuild set-name $name
 copy_bin_from_net https://github.com/ohjames/smell-baron/releases/download/v0.4.2/smell-baron.musl /bin/smell-baron
-sudo acbuild set-exec /bin/smell-baron
 
 sudo acbuild run apk update
 sudo acbuild run apk add openvpn
+
+sudo acbuild set-exec smell-baron openvpn /var/vpn-config/cfg.ovpn
+
 sudo acbuild write --overwrite $dest_aci
