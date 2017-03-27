@@ -1,5 +1,7 @@
 #!/bin/zsh
 
+setopt nullglob
+
 # dns=8.8.8.8
 dns=127.0.0.1
 
@@ -7,6 +9,13 @@ die() {
   echo $*
   exit 1
 }
+
+thisdir=$(dirname $0)
+aci=$(echo $thisdir/../share/sonkar-*.aci)
+if [[ ! -f "$aci" ]] ; then
+  aci=$(echo $thisdir/sonkar-*.aci)
+  [[ -f "$aci" ]] || die could not find aci
+fi
 
 if [ x$1 = xip ] ; then
   sudo rkt list | grep sonkar | grep running | sed 's/.*=//'
@@ -31,4 +40,4 @@ sudo rkt run \
   --volume vpnconfig,kind=host,source=$tmpdir \
   --mount volume=vpnconfig,target=/var/vpn-config \
   --port=proxy:1080 \
-  ./*.aci $*
+  $aci $*
