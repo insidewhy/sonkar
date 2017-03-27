@@ -30,4 +30,5 @@ sudo rkt run \
   --dns=$dns --net=default --interactive \
   --volume vpnconfig,kind=host,source=$tmpdir \
   --mount volume=vpnconfig,target=/var/vpn-config \
+  --port=proxy:1080 \
   ./*.aci $*
