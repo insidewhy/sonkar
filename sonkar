@@ -2,8 +2,12 @@
 
 setopt nullglob
 
-# dns=8.8.8.8
-dns=127.0.0.1
+typeset -A opts
+zparseopts -M -A opts h: c: e:
+
+openvpn_cfg=${opts[-c]}
+hosts=${opts[-h]}
+exec=${opts[-e]}
 
 die() {
   echo $*
@@ -30,14 +34,19 @@ finish() {
 }
 trap finish EXIT TERM
 
-cp $1 $tmpdir/cfg.ovpn || die could not copy ovpn config to $tmpdir
+cp $openvpn_cfg $tmpdir/cfg.ovpn || die could not copy ovpn config to $tmpdir
+if [[ $hosts ]] ; then
+  cp $hosts $tmpdir/hosts
+else
+  touch $tmpdir/hosts
+fi
 shift
 
 # sudo iptables -P FORWARD ACCEPT
 sudo rkt run \
   --insecure-options=image,paths,capabilities \
-  --dns=$dns --net=default --interactive \
+  --dns=127.0.0.1 --net=default --interactive \
   --volume vpnconfig,kind=host,source=$tmpdir \
   --mount volume=vpnconfig,target=/var/vpn-config \
   --port=proxy:1080 \
-  $aci $*
+  $aci ${exec+--exec=$exec}
