@@ -27,13 +27,16 @@ acbuild port add proxy tcp 1080
 copy_bin_from_net https://github.com/ohjames/smell-baron/releases/download/v0.4.2/smell-baron.musl /bin/smell-baron
 
 sudo acbuild run apk update
-sudo acbuild run apk add openvpn bind
-sudo acbuild run mv /etc/bind/named.conf{.recursive,}
+sudo acbuild run apk add openvpn dnsmasq
 sudo acbuild run apk add -- dante-server \
   --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ --allow-untrusted
 sudo acbuild copy cfg/sockd.conf /etc/sockd.conf
 sudo acbuild copy bin/run-sockd.sh /bin/run-sockd.sh
+sudo acbuild copy bin/run-dnsmasq.sh /bin/run-dnsmasq.sh
 
-sudo acbuild set-exec -- smell-baron openvpn /var/vpn-config/cfg.ovpn --- run-sockd.sh --- named -f
+sudo acbuild set-exec -- smell-baron \
+  -c run-dnsmasq.sh --- \
+  openvpn --config /var/vpn-config/cfg.ovpn --script-security 2 --up '/bin/run-dnsmasq.sh up' --down /bin/run-dnsmasq.sh --- \
+  run-sockd.sh
 
 sudo acbuild write --overwrite $dest_aci
