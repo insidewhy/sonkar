@@ -1,6 +1,6 @@
 # Installation
 
-First install `rkt` and `acbuild` and ensure the user running `./build.zsh` has `sudo` access to (at least) `rkt` and `acbuild`.
+First install `rkt`, `zsh` and `acbuild` and ensure the user running `./build.zsh` has `sudo` access to (at least) `rkt` and `acbuild`.
 
 ```
 ./build.zsh
