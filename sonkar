@@ -2,17 +2,19 @@
 
 setopt nullglob
 
-typeset -A opts
-zparseopts -M -A opts h: c: e:
-
-openvpn_cfg=${opts[-c]}
-hosts=${opts[-h]}
-exec=${opts[-e]}
-
 die() {
   echo $*
   exit 1
 }
+
+typeset -A opts
+zparseopts -D -A opts h: e:
+
+openvpn_cfg=$1
+[ -z $1 ] && die must provide openvpn config file
+
+hosts=${opts[-h]}
+exec=${opts[-e]}
 
 thisdir=$(dirname $0)
 aci=$(echo $thisdir/../share/sonkar-*.aci)
@@ -26,13 +28,11 @@ if [ x$1 = xip ] ; then
   exit 0
 fi
 
-[ $# -eq 0 ] && die must provide ovpn file
-tmpdir=$(mktemp -d)
-
-finish() {
+cleanup() {
   [ -d $tmpdir ] && rm -r $tmpdir
 }
-trap finish EXIT TERM
+trap cleanup EXIT TERM
+tmpdir=$(mktemp -d)
 
 cp $openvpn_cfg $tmpdir/cfg.ovpn || die could not copy ovpn config to $tmpdir
 if [[ $hosts ]] ; then
@@ -40,7 +40,6 @@ if [[ $hosts ]] ; then
 else
   touch $tmpdir/hosts
 fi
-shift
 
 # sudo iptables -P FORWARD ACCEPT
 sudo rkt run \
