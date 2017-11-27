@@ -36,7 +36,7 @@ sudo acbuild copy bin/run-dnsmasq.sh /bin/run-dnsmasq.sh
 
 sudo acbuild set-exec -- smell-baron \
   -c run-dnsmasq.sh --- \
-  openvpn --config /var/vpn-config/cfg.ovpn --script-security 2 --up '/bin/run-dnsmasq.sh up' --down /bin/run-dnsmasq.sh --- \
+  openvpn --config /var/vpn-config/cfg.ovpn --script-security 2 --ping 5 --ping-restart 10 --up-restart --up '/bin/run-dnsmasq.sh up' --down /bin/run-dnsmasq.sh --- \
   run-sockd.sh
 
 sudo acbuild write --overwrite $dest_aci
