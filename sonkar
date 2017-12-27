@@ -8,13 +8,14 @@ die() {
 }
 
 typeset -A opts
-zparseopts -D -A opts h: e:
+zparseopts -D -A opts h: e: t:
 
 openvpn_cfg=$1
 [ -z $1 ] && die must provide openvpn config file
 
 hosts=${opts[-h]}
 exec=${opts[-e]}
+torrentdir=${opts[-t]}
 
 thisdir=$(dirname $0)
 aci=$(echo $thisdir/../share/sonkar-*.aci)
@@ -41,6 +42,14 @@ else
   touch $tmpdir/hosts
 fi
 
+extra_args=()
+if [ -n "$torrentdir" ]; then
+  extra_args+=--volume
+  extra_args+=torrentdir,kind=host,source=$torrentdir
+  extra_args+=--mount
+  extra_args+=volume=torrentdir,target=/var/torrents
+fi
+
 # sudo iptables -P FORWARD ACCEPT
 sudo rkt run \
   --insecure-options=image,paths,capabilities \
@@ -48,4 +57,6 @@ sudo rkt run \
   --volume vpnconfig,kind=host,source=$tmpdir \
   --mount volume=vpnconfig,target=/var/vpn-config \
   --port=proxy:1080 \
+  --port=transmission:9091 \
+  $extra_args \
   $aci ${exec+--exec=$exec}
