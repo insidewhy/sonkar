@@ -19,9 +19,11 @@ copy_bin_from_net() {
   sudo acbuild copy .resources/$fname $2
 }
 
-acbuild begin
-acbuild dependency add quay.io/chilon/alpine-3.5
-# acbuild dependency add quay.io/aptible/busybox
+acbuild begin docker://alpine
+# acbuild begin
+# acbuild dependency add quay.io/chilon/alpine-3.5
+# # acbuild dependency add quay.io/aptible/busybox
+
 acbuild set-name $name
 acbuild port add proxy tcp 1080
 copy_bin_from_net https://github.com/ohjames/smell-baron/releases/download/v0.4.2/smell-baron.musl /bin/smell-baron
