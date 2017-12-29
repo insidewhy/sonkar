@@ -8,7 +8,7 @@ die() {
 }
 
 typeset -A opts
-zparseopts -D -A opts h: e: t: b:
+zparseopts -D -A opts h: e: t: b: n:
 
 if [[ $1 = t || $1 = transmission ]] ; then
   id=$(rkt list | grep sonkar | grep running | cut -f1)
@@ -19,6 +19,7 @@ fi
 openvpn_cfg=$1
 [ -z $1 ] && die must provide openvpn config file
 
+network=${opts[-n]:-default}
 bindaddr=${opts[-b]:-0.0.0.0}
 hosts=${opts[-h]}
 exec=${opts[-e]}
@@ -60,7 +61,7 @@ fi
 # sudo iptables -P FORWARD ACCEPT
 sudo rkt run \
   --insecure-options=image,paths,capabilities \
-  --dns=127.0.0.1 --net=default --interactive \
+  --dns=127.0.0.1 --net=$network --interactive \
   --volume vpnconfig,kind=host,source=$tmpdir \
   --mount volume=vpnconfig,target=/var/vpn-config \
   --port=proxy:$bindaddr:1080 \
