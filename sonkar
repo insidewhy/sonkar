@@ -10,6 +10,12 @@ die() {
 typeset -A opts
 zparseopts -D -A opts h: e: t:
 
+if [[ $1 = t || $1 = transmission ]] ; then
+  id=$(rkt list | grep sonkar | grep running | cut -f1)
+  sudo rkt enter $id /bin/run-transmission.sh up
+  exit
+fi
+
 openvpn_cfg=$1
 [ -z $1 ] && die must provide openvpn config file
 

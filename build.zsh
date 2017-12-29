@@ -42,7 +42,6 @@ sudo acbuild copy bin/run-transmission.sh /bin/run-transmission.sh
 sudo acbuild set-exec -- smell-baron \
   -c run-dnsmasq.sh --- \
   openvpn --config /var/vpn-config/cfg.ovpn --script-security 2 --ping 5 --ping-restart 10 --up-restart --up '/bin/run-dnsmasq.sh up' --down /bin/run-dnsmasq.sh --- \
-  run-sockd.sh --- \
-  run-transmission.sh up
+  run-sockd.sh
 
 sudo acbuild write --overwrite $dest_aci
